@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>badi </title>
+    <style>
+        #copy {
+            width: 400px;
+            height: 400px;
+            border: 1px solid red;
+        }
+
+        #copy div {
+            width: 100px;
+            height: 100px;
+            line-height: 100px;
+            font-size: 50px;
+            box-sizing: border-box;
+            text-align: center;
+            border: 1px solid red;
+            float: left;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="copy"></div>
+    <script>
+        //创建界面
+        function jiemian() {
+            var copy = document.getElementById('copy')
+            for (var y = 0; y < 4; y++) {
+                for (var x = 0; x < 4; x++) {
+                    var div = document.createElement('div')
+                    div.id = String(x) + String(y)
+                    copy.appendChild(div)
+                }
+            }
+        }
+        //生成介于max与min之间的整数
+        function zhengshu(max, min) {
+            var max = Math.ceil(max);
+            var min = Math.ceil(min)
+            return Math.floor(Math.random() * (max - min) + min);
+        }
+        //随机生成2or4
+        function suiji() {
+            if (Math.random() > 0.5) {
+                return 2
+            } else {
+                return 4;
+            }
+        }
+        //把随机生成的2或者4渲染到界面上
+        function dye(num) {
+            var results = []
+            var numArr = document.querySelectorAll('#copy > div')
+            for (var i = 0; i < numArr.length; i++) {
+                if (numArr[i].textContent === '') {
+                    results.push(numArr[i])
+                }
+            }
+            var position = zhengshu(0, results.length)
+            results[position].textContent = num
+        }
+        //给按钮绑定事件
+        function key() {
+            document.addEventListener('keyup', function (e) {
+                var code = e.keyCode
+                if (code === 37 && left()) {
+                    moveLeft()
+                } else if (code === 38 && up()) {
+                    moveUp()
+                } else if (code === 39 && right()) {
+                    moveRight()
+                } else if (code === 40 && down()) {
+                    moveDown()
+                }
+            })
+        }
+
+
+ 
+        //左上特殊加法运算
+        function leftUp(arr) {
+            var results = []
+            var numArr = []
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i] !== '') {
+                    numArr.push(arr[i])
+                }
+            }
+            var flen = numArr.length
+            for (var i = 0; i < flen; i++) {
+                if (i === flen - 1) {
+                    results.push(numArr[i])
+                } else if (numArr[i] === numArr[i + 1]) {
+                    results.push(numArr[i] + numArr[i + 1])
+                    i++;
+                } else {
+                    results.push(numArr[i])
+                }
+            }
+            return results;
+        }
+        //右下特殊加法运算
+        function rightDown(arr) {
+            var results = []
+            var numArr = []
+            for (var i = arr.length - 1; i > -1; i--) {
+                if (arr[i] !== '') {
+                    numArr.push(arr[i])
+                }
+            }
+            var flen = numArr.length
+            for (var i = 0; i < flen; i++) {
+                if (i === flen - 1) {
+                    results.push(numArr[i])
+                } else if (numArr[i] === numArr[i + 1]) {
+                    results.push(numArr[i] + numArr[i + 1])
+                    i++;
+                } else {
+                    results.push(numArr[i])
+                }
+            }
+            return results;
+        }
+
+
+
+        //左移的函数
+        function moveLeft() {
+
+            //获取所有的格子元素
+            var boxes = Array.prototype.slice.call(document.querySelectorAll('#copy > div'));
+
+            //把格子元素分成4行，每行4个格子
+            var rows = [];
+            for (var i = 0; i < 16; i = i + 4) {
+                rows.push(boxes.slice(i, i + 4));
+                // console.log('rows',rows)
+            }
+
+            //获取每一行格子的内容，并且转成整数
+            var rowValues = [];
+            for (var i = 0; i < rows.length; i++) {
+                var values = [];
+                for (var k = 0; k < rows[i].length; k++) {
+                    var value = rows[i][k].textContent;
+                    values.push(value === '' ? '' : parseInt(value));
+                }
+                rowValues.push(values);
+            }
+            //    console.log('rowValues',rowValues)
+
+            //计算向左加法运算之后的数组
+            var resultRowValues = [];
+            for (var i = 0; i < rowValues.length; i++) {
+                resultRowValues.push(leftUp(rowValues[i]));
+            }
+
+
+            for (var i = 0; i < resultRowValues.length; i++) {
+                for (var k = 0; k < 4; k++) {
+                    rows[i][k].textContent = resultRowValues[i][k];
+                }
+            }
+            dye(suiji())
+        }
+        //上移的函数
+        function moveUp() {
+
+            //获取所有的格子元素
+            var boxes = Array.prototype.slice.call(document.querySelectorAll('#copy > div'));
+
+            //把格子元素分成4行，每行4个格子
+            var rows = [];
+            for (var i = 0; i < 4; i++) {
+                var row_down = []
+                for (var k = i; k < 16; k = k + 4) {
+                    row_down.push(boxes[k]);
+                }
+                rows.push(row_down)
+            }
+
+            //获取每一行格子的内容，并且转成整数
+            var rowValues = [];
+            for (var i = 0; i < rows.length; i++) {
+                var values = [];
+                for (var k = 0; k < rows[i].length; k++) {
+                    var value = rows[i][k].textContent;
+                    values.push(value === '' ? '' : parseInt(value));
+                }
+                rowValues.push(values);
+            }
+            //    console.log('rowValues',rowValues)
+
+            //计算向左加法运算之后的数组
+            var resultRowValues = [];
+            for (var i = 0; i < rowValues.length; i++) {
+                resultRowValues.push(rightDown(rowValues[i]));
+            }
+
+
+            for (var i = 0; i < resultRowValues.length; i++) {
+                for (var k = 0; k < 4; k++) {
+                    rows[i][k].textContent = resultRowValues[i][k];
+                }
+            }
+            dye(suiji())
+        }
+        //右移的函数
+        function moveRight() {
+
+            //获取所有的格子元素
+            var boxes = Array.prototype.slice.call(document.querySelectorAll('#copy > div'));
+
+            //把格子元素分成4行，每行4个格子
+            var rows = [];
+            for (var i = 0; i < 16; i = i + 4) {
+                rows.push(boxes.slice(i, i + 4));
+                // console.log('rows',rows)
+            }
+
+            //获取每一行格子的内容，并且转成整数
+            var rowValues = [];
+            for (var i = 0; i < rows.length; i++) {
+                var values = [];
+                for (var k = 0; k < rows[i].length; k++) {
+                    var value = rows[i][k].textContent;
+                    values.push(value === '' ? '' : parseInt(value));
+                }
+                rowValues.push(values);
+            }
+            //    console.log('rowValues',rowValues)
+
+            //计算向左加法运算之后的数组
+            var resultRowValues = [];
+            for (var i = 0; i < rowValues.length; i++) {
+                resultRowValues.push(leftUp(rowValues[i]));
+            }
+
+
+            for (var i = 0; i < resultRowValues.length; i++) {
+                for (var k = 0; k < 4; k++) {
+                    rows[i][k].textContent = resultRowValues[i][3 - k];
+                }
+            }
+            dye(suiji())
+        }
+        //下移的函数
+        function moveDown() {
+
+            //获取所有的格子元素
+            var boxes = Array.prototype.slice.call(document.querySelectorAll('#copy > div'));
+
+            //把格子元素分成4行，每行4个格子
+            var rows = [];
+            for (var i = 0; i < 4; i++) {
+                var row_down = []
+                for (var k = i; k < 16; k = k + 4) {
+                    row_down.push(boxes[k]);
+                }
+                rows.push(row_down)
+            }
+
+            //获取每一行格子的内容，并且转成整数
+            var rowValues = [];
+            for (var i = 0; i < rows.length; i++) {
+                var values = [];
+                for (var k = 0; k < rows[i].length; k++) {
+                    var value = rows[i][k].textContent;
+                    values.push(value === '' ? '' : parseInt(value));
+                }
+                rowValues.push(values);
+            }
+            //    console.log('rowValues',rowValues)
+
+            //计算向左加法运算之后的数组
+            var resultRowValues = [];
+            for (var i = 0; i < rowValues.length; i++) {
+                resultRowValues.push(rightDown(rowValues[i]));
+            }
+
+
+            for (var i = 0; i < resultRowValues.length; i++) {
+                for (var k = 0; k < 4; k++) {
+                    rows[i][k].textContent = resultRowValues[i][3 - k];
+                }
+            }
+            dye(suiji())
+        }
+
+
+
+        //左上的移动条件
+        function move(arr) {
+            var numArr = [];
+            //是否有相邻且相等的数字
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i] !== '') {
+                    numArr.push(arr[i])
+                }
+            }
+            for (var i = 0; i < numArr.length; i++) {
+                if (numArr[i] === numArr[i + 1]) {
+                    return true;
+                }
+            }
+            //第一个空格右边是否有数字
+            var nothing = -1;
+            var Yes = -1;
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i] === '') {
+                    nothing = i;
+                    break;
+                }
+            }
+            for (var i = nothing + 1; i < arr.length; i++) {
+                if (arr[i] !== '') {
+                    Yes = i;
+                    break;
+                }
+            }
+            if (nothing !== -1 && Yes !== -1) {
+                return true;
+            }
+            return false;
+        }
+
+        //右下的移动条件
+        function move_2(arr) {
+            var numArr = [];
+            //是否有相邻且相等的数字
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i] !== '') {
+                    numArr.push(arr[i])
+                }
+            }
+            for (var i = numArr.length - 1; i > 0; i--) {
+                if (numArr[i] === numArr[i - 1]) {
+                    return true;
+                }
+            }
+            //第一个空格右边是否有数字
+            var nothing = -1;
+            var Yes = -1;
+            for (var i = arr.length - 1; i > -1; i--) {
+                if (arr[i] === '') {
+                    nothing = i;
+                    break;
+                }
+            }
+            for (var i = nothing - 1; i > -1; i--) {
+                if (arr[i] !== '') {
+                    Yes = i;
+                    break;
+                }
+            }
+            if (nothing !== -1 && Yes !== -1) {
+                return true;
+            }
+            return false;
+        }
+
+
+
+        //判断是否可移
+        //左    
+        function left() {
+            //获取所有的格子元素
+            var boxes = Array.prototype.slice.call(document.querySelectorAll('#copy > div'));
+
+            //把格子元素分成4行，每行4个格子
+            var rows = [];
+            for (var i = 0; i < 16; i = i + 4) {
+                rows.push(boxes.slice(i, i + 4));
+                // console.log('rows',rows)
+            }
+
+            //获取每一行格子的内容，并且转成整数
+            var rowValues = [];
+            for (var i = 0; i < rows.length; i++) {
+                var values = [];
+                for (var k = 0; k < rows[i].length; k++) {
+                    var value = rows[i][k].textContent;
+                    values.push(value == '' ? '' : parseInt(value));
+                }
+                rowValues.push(values);
+                if (move(values)) {
+                    return true;
+                }
+            }
+
+
+            //计算向左加法运算之后的数组
+            var resultRowValues = [];
+            for (var i = 0; i < rowValues.length; i++) {
+                resultRowValues.push(leftUp(rowValues[i]));
+            } if (move(resultRowValues)) {
+                return true;
+            }
+            return false;
+        }
+        //上
+        function up() {
+            //获取所有的格子元素
+            var boxes = Array.prototype.slice.call(document.querySelectorAll('#copy > div'));
+
+            //把格子元素分成4行，每行4个格子
+            var rows = [];
+            for (var i = 0; i < 4; i++) {
+                var row_down = []
+                for (var k = i; k < 16; k = k + 4) {
+                    row_down.push(boxes[k]);
+                }
+                rows.push(row_down)
+            }
+
+            //获取每一行格子的内容，并且转成整数
+            var rowValues = [];
+            for (var i = 0; i < rows.length; i++) {
+                var values = [];
+                for (var k = 0; k < rows[i].length; k++) {
+                    var value = rows[i][k].textContent;
+                    values.push(value === '' ? '' : parseInt(value));
+                }
+                rowValues.push(values);
+                if (move(values)) {
+                    return true;
+                }
+            }
+
+            //计算向左加法运算之后的数组
+            var resultRowValues = [];
+            for (var i = 0; i < rowValues.length; i++) {
+                resultRowValues.push(rightDown(rowValues[i]));
+            } if (move(resultRowValues)) {
+                return true;
+            }
+            return false;
+        }
+        //下
+        function down() {
+            //获取所有的格子元素
+            var boxes = Array.prototype.slice.call(document.querySelectorAll('#copy > div'));
+
+            //把格子元素分成4行，每行4个格子
+            var rows = [];
+            for (var i = 0; i < 4; i++) {
+                var row_down = []
+                for (var k = i; k < 16; k = k + 4) {
+                    row_down.push(boxes[k]);
+                }
+                rows.push(row_down)
+
+            }
+
+            //获取每一行格子的内容，并且转成整数
+            var rowValues = [];
+            for (var i = 0; i < rows.length; i++) {
+                var values = [];
+                for (var k = 0; k < rows[i].length; k++) {
+                    var value = rows[i][k].textContent;
+                    values.push(value === '' ? '' : parseInt(value));
+                }
+                rowValues.push(values);
+                if (move_2(values)) {
+                    return true;
+                }
+            }
+
+            //计算向左加法运算之后的数组
+            var resultRowValues = [];
+            for (var i = 0; i < rowValues.length; i++) {
+                resultRowValues.push(rightDown(rowValues[i]));
+            } if (move_2(resultRowValues)) {
+                return true;
+            }
+            return false;
+        }
+        //右
+        function right() {
+            //获取所有的格子元素
+            var boxes = Array.prototype.slice.call(document.querySelectorAll('#copy > div'));
+
+            //把格子元素分成4行，每行4个格子
+            var rows = [];
+            for (var i = 0; i < 16; i = i + 4) {
+                rows.push(boxes.slice(i, i + 4));
+            }
+
+            //获取每一行格子的内容，并且转成整数
+            var rowValues = [];
+            for (var i = 0; i < rows.length; i++) {
+                var values = [];
+                for (var k = 0; k < rows[i].length; k++) {
+                    var value = rows[i][k].textContent;
+                    values.push(value === '' ? '' : parseInt(value));
+                }
+                rowValues.push(values);
+                if (move_2(values)) {
+                    return true;
+                }
+            }
+
+            //计算向左加法运算之后的数组
+            var resultRowValues = [];
+            for (var i = 0; i < rowValues.length; i++) {
+                resultRowValues.push(rightDown(rowValues[i]));
+            } if (move_2(resultRowValues)) {
+                return true;
+            }
+            return false;
+        }               
+
+        jiemian()
+
+        dye(suiji())
+        dye(suiji())
+
+        key()
+    </script>
+</body>
+
+</html>
